@@ -1,6 +1,7 @@
 module Level (
     createLevel,
     addLevel,
+    getLevel,
     Level
 )
 where
@@ -16,3 +17,6 @@ createLevel x | x < 1 = Nothing
 
 addLevel :: Level -> Int -> Maybe Level
 addLevel (Level x) y = createLevel $ x + y
+
+getLevel :: Level -> Int
+getLevel (Level x) = x
