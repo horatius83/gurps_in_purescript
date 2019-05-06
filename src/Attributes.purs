@@ -2,9 +2,10 @@ module Attributes where
 
 import Prelude
 
+import Data.Int (floor, toNumber)
+import Data.Newtype (overF)
 import Level (Level, getLevel)
 import TechLevel (TechLevel(..))
-import Data.Int (floor, toNumber)
 
   
 -- Basic attributes
@@ -80,5 +81,18 @@ getAverageWealthPerTechLevel (TechLevel tl) = Money (floor fpr)
         fp = toNumber tl 
         fpr = (1.0 + fp) * 1500.0
 
---getStartingWealth :: Wealth -> TechLevel -> Money
---getStartingWealth 
+getStartingWealth :: Wealth -> TechLevel -> Money
+getStartingWealth wealth tl = multiplyMoney multiplier avgAmount
+    where 
+        multiplyMoney x (Money m) = Money (floor (x * (toNumber m)))
+        avgAmount = getAverageWealthPerTechLevel tl
+        multiplier =
+            case wealth of
+                Destitute -> 0.0
+                Poor -> 0.2
+                Struggling -> 0.5
+                LowerMiddleClass -> 1.0
+                UpperMiddleClass -> 2.0
+                Wealthy -> 5.0
+                VeryWealthy -> 20.0
+                UltraWealthy -> 100.0
