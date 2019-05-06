@@ -1,11 +1,13 @@
 module Attributes where
 
-import Level (Level, getLevel)
-{-import Data.Ord
-import Data.HeytingAlgebra         -}
 import Prelude
 
+import Level (Level, getLevel)
+import TechLevel (TechLevel(..))
+import Data.Int (floor, toNumber)
+
   
+-- Basic attributes
 newtype Attribute = Attribute Level 
 newtype BuildPoint = BuildPoint Int
 
@@ -24,3 +26,59 @@ getPointCost (Attribute level) =  getPointCostFromValue levelValue
             | x == 15 = BuildPoint 60
             | x == 16 = BuildPoint 80
             | otherwise = BuildPoint (100 + ((x - 17) * 25))
+
+
+-- Physical Appearance
+data Handedness = Left | Right | Ambidexterous
+
+newtype Reaction = Reaction Int
+
+data Appearance = Hideous | Ugly | Unattractive | Average | Attracive | Beautiful | Gorgeous
+
+getAppearanceReactionModifier :: Appearance -> Reaction
+getAppearanceReactionModifier a = Reaction 
+    case a of
+        Hideous -> (-4)
+        Ugly -> (-2)
+        Unattractive -> (-1)
+        Average -> 0
+        Attracive -> 1
+        Beautiful -> 4
+        Gorgeous -> 6
+
+getAppearanceBp :: Appearance -> BuildPoint
+getAppearanceBp a = BuildPoint
+    case a of
+        Hideous -> (-20)
+        Ugly -> (-10)
+        Unattractive -> (-5)
+        Average -> 0
+        Attracive -> 5
+        Beautiful -> 15
+        Gorgeous -> 25
+
+
+-- Wealth and Status
+data Wealth = Destitute | Poor | Struggling | LowerMiddleClass | UpperMiddleClass | Wealthy | VeryWealthy | UltraWealthy
+data Money = Money Int
+
+getWealthBp :: Wealth -> BuildPoint
+getWealthBp w = BuildPoint
+    case w of
+        Destitute -> (-25)
+        Poor -> (-15)
+        Struggling -> (-10)
+        LowerMiddleClass -> 0
+        UpperMiddleClass -> 10
+        Wealthy -> 20
+        VeryWealthy -> 30
+        UltraWealthy -> 50
+
+getAverageWealthPerTechLevel :: TechLevel -> Money
+getAverageWealthPerTechLevel (TechLevel tl) = Money (floor fpr)
+    where
+        fp = toNumber tl 
+        fpr = (1.0 + fp) * 1500.0
+
+--getStartingWealth :: Wealth -> TechLevel -> Money
+--getStartingWealth 
