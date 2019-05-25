@@ -2,15 +2,14 @@ module Attributes where
 
 import Prelude
 
+import BuildPoints (BuildPoint(..))
 import Data.Int (floor, toNumber)
-import Data.Newtype (overF)
+import Data.Maybe (Maybe(..))
 import Level (Level, getLevel)
 import TechLevel (TechLevel(..))
-
   
 -- Basic attributes
 newtype Attribute = Attribute Level 
-newtype BuildPoint = BuildPoint Int
 
 type Attributes = {strength :: Attribute, dexterity :: Attribute, intelligence :: Attribute, health :: Attribute}
 
@@ -58,7 +57,6 @@ getAppearanceBp a = BuildPoint
         Beautiful -> 15
         Gorgeous -> 25
 
-
 -- Wealth and Status
 data Wealth = Destitute | Poor | Struggling | LowerMiddleClass | UpperMiddleClass | Wealthy | VeryWealthy | UltraWealthy
 data Money = Money Int
@@ -96,3 +94,39 @@ getStartingWealth wealth tl = multiplyMoney multiplier avgAmount
                 Wealthy -> 5.0
                 VeryWealthy -> 20.0
                 UltraWealthy -> 100.0
+
+-- Reputation
+newtype ReputationModifier = ReputationModifier Int
+data SizeOfGroup = Everyone | Large | Small
+data FrequencyOfRecognition = Always | Sometimes | Rarely
+type NameOfGroup = String 
+data Group = Group NameOfGroup SizeOfGroup FrequencyOfRecognition
+data Reputation = Reputation ReputationModifier Group
+
+createReputationModifier :: Int -> Maybe ReputationModifier
+createReputationModifier x | x > -5 && x < 5 = Just $ ReputationModifier x
+                           | otherwise = Nothing
+
+getReputationBp :: Reputation -> BuildPoint
+getReputationBp (Reputation (ReputationModifier m) (Group _ sizeOfGroup freq)) = BuildPoint bps
+    where
+        sizeOfGroupModifier = case sizeOfGroup of
+            Everyone -> 1.0
+            Large -> 0.5
+            Small -> 0.33
+        frequencyModifier = case freq of
+            Always -> 1.0
+            Sometimes -> 0.5
+            Rarely -> 0.33
+        bps = floor $ sizeOfGroupModifier * frequencyModifier * (toNumber m) * 5.0
+
+-- Status
+newtype Status = Status Int
+
+createStatus :: Int -> Maybe Status
+createStatus x | x >= -4 && x <= 8 = Just $ Status x
+               | otherwise = Nothing
+
+getStatusBp :: Status -> BuildPoint
+getStatusBp (Status x) = BuildPoint $ x * 5
+

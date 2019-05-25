@@ -1,10 +1,16 @@
 module TechLevel (
-    TechLevel(..)
+    TechLevel(..),
+    createTechLevel
 ) where
   
-import Data.Show (class Show)
+import Data.Maybe (Maybe(..))
+import Prelude
 
 newtype TechLevel = TechLevel Int
+
+createTechLevel :: Int -> Maybe TechLevel
+createTechLevel level | level >= 0 = Just $ TechLevel level
+                      | otherwise = Nothing
 
 instance showTechLevel :: Show TechLevel where
     show (TechLevel t) = 
@@ -17,12 +23,12 @@ instance showTechLevel :: Show TechLevel where
             5 -> "Industrial Revolution"
             6 -> "World War I/World War II"
             7 -> "Modern"
-            8 -> "Space Age"
-            9 -> "Diamond Age"
-            10 -> "Kardashev Type 1"
-            11 -> "FTL radio"
-            12 -> "Slow FTL"
-            13 -> "Fast FTL"
+            8 -> "Early Spacefaring"
+            9 -> "Solar System Colonization"
+            10 -> "Low FTL"
+            11 -> "Star System Colonization"
+            12 -> "Fast FTL"
+            13 -> "Galactic Colonization"
             14 -> "Kardashev Type 2" 
             15 -> "Kardeshev Type 3"
             _ -> "Transcendent"
