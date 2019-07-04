@@ -15,7 +15,7 @@ import TechLevel (TechLevel(..))
 import World (DivinityType(..), World)
 
 data LevelCap = None | LevelCap Int
-data Level = Level LevelCap BuildPoint | Fixed BuildPoint | WorldCalculation (World -> BuildPoint)
+data Level = Level LevelCap BuildPoint | Fixed BuildPoint | WorldCalculation (World -> BuildPoint) | LevelFunc LevelCap (Int -> BuildPoint)
 type Description = String
 type Name = String
 data Advantage = Advantage Name Description Level
@@ -48,10 +48,16 @@ advantageMap = fromFoldable (map toTuple advantages)
             Advantage "Lightning Calculator" "Can do math in head instantly" (Fixed (BuildPoint 5)),
             Advantage "Literacy" "Can read (depends on tech level whether this takes BP)" (WorldCalculation literacyCost),
             Advantage "Longevity" "Fail aging rolls on a natural 17 or 18. Get no points for taking Age as disadvantage" (Fixed (BuildPoint 5)),
-            Advantage "Luck" "Lvl 1: Once every hour of play, may roll 3 dice and choose best result, Lvl 2: ...every 30 minutes" (Level (LevelCap 2) (BuildPoint 15))
+            Advantage "Luck" "Lvl 1: Once every hour of play, may roll 3 dice and choose best result, Lvl 2: ...every 30 minutes" (Level (LevelCap 2) (BuildPoint 15)),
+            Advantage "Magical Aptitude" "IQ + Level for learning spells, GM rolls against IQ + level when encountering magic objects" (LevelFunc (LevelCap 3) magicalAptitudeCost),
+            Advantage "Magical Resistance" "Subtract from casters level, does not affect missile spells/information spells" (Level None (BuildPoint 2)),
+            Advantage "Methematical Ability" "+3 on math or computer skills (except Computer operation), +2 on any engineering skill TL 6+" (Fixed (BuildPoint 10))
         ]
         toTuple a@(Advantage name _ _) = Tuple name a
         clericalCost {divinityType: Secular} = BuildPoint 5
         clericalCost {divinityType: Divine} = BuildPoint 10
         literacyCost {techLevel: (TechLevel x)} | x <= 4 = BuildPoint 10
                                     | otherwise = BuildPoint 0
+        magicalAptitudeCost lvl | lvl == 1 = BuildPoint 15
+                                | lvl < 4 = BuildPoint 10
+                                | otherwise = BuildPoint (-1)
